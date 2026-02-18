@@ -95,13 +95,17 @@ async def main():
     # Graceful shutdown
     shutdown = asyncio.Event()
 
-    def handle_signal():
+    def handle_signal(*args):
         logger.info("Shutdown signal received")
         shutdown.set()
 
-    loop = asyncio.get_event_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, handle_signal)
+    if sys.platform == "win32":
+        signal.signal(signal.SIGINT, handle_signal)
+        signal.signal(signal.SIGTERM, handle_signal)
+    else:
+        loop = asyncio.get_event_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, handle_signal)
 
     try:
         await bot.start()

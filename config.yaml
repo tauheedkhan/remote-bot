@@ -8,7 +8,7 @@ telegram:
 
 claude:
   # The project directory Claude Code runs in (reads its CLAUDE.md, .claude/, git state, etc.)
-  project_dir: "/Users/tauheedkhan/projects/bots/algo-trading-crypto"
+  project_dir: 'C:\Users\Administrator\projects\quantforge'
 
   # Append to Claude Code's system prompt (doesn't replace it, keeps built-in tools)
   append_system_prompt: |
