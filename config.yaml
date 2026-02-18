@@ -1,0 +1,61 @@
+# Sentinel - Your Personal AI Daemon
+# Claude Code CLI + Telegram + Heartbeat
+
+telegram:
+  bot_token: "${TELEGRAM_BOT_TOKEN}"
+  allowed_users:
+    - ${TELEGRAM_USER_ID}
+
+claude:
+  # The project directory Claude Code runs in (reads its CLAUDE.md, .claude/, git state, etc.)
+  project_dir: "/Users/tauheedkhan/projects/bots/algo-trading-crypto"
+
+  # Append to Claude Code's system prompt (doesn't replace it, keeps built-in tools)
+  append_system_prompt: |
+    You are Sentinel, a personal AI daemon running on your operator's infrastructure.
+    You are lean, direct, and proactive. Keep responses concise for Telegram.
+    Your operator is a senior engineer — match that level.
+    You have full access to the host system via your built-in tools.
+    Read CLAUDE.md for persistent memory and context about your operator.
+
+  # Tools auto-approved in headless mode (no one to click "approve")
+  allowed_tools:
+    - Bash
+    - Read
+    - Write
+    - Edit
+    - Glob
+    - Grep
+    - WebFetch
+    - WebSearch
+
+  max_turns: 25           # Max tool-use rounds per message
+  timeout: 120            # Max seconds per CLI call
+
+heartbeat:
+  interval_seconds: 300
+  enabled: true
+
+monitors:
+  - name: url_health
+    enabled: false
+    urls:
+      - "https://your-api.com/health"
+
+  - name: command_runner
+    enabled: false
+    commands:
+      - name: disk_usage
+        cmd: "df -h / | tail -1 | awk '{print $5}' | sed 's/%//'"
+        alert_if: "gt:85"
+      - name: docker_health
+        cmd: "docker ps --filter 'status=exited' --format '{{.Names}}'"
+        alert_if: "not_empty"
+
+  - name: log_watcher
+    enabled: false
+    paths:
+      - "/var/log/app/error.log"
+    patterns:
+      - "ERROR"
+      - "CRITICAL"
